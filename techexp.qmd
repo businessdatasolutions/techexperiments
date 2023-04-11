@@ -1,0 +1,82 @@
+---
+title: "Tech Experiments"
+format: html
+---
+
+## Sentiment
+
+```{python}
+import requests
+import ipywidgets as widgets
+from ipywidgets import interact
+from IPython.display import display
+```
+
+
+```{python}
+
+w = widgets.Text(
+    value='I hated the movie',
+    placeholder='Type something',
+    description='String:',
+    disabled=False   
+)
+
+display(w)
+```
+
+```{python}
+
+
+API_URL = "https://api-inference.huggingface.co/models/cardiffnlp/twitter-xlm-roberta-base-sentiment"
+headers = {"Authorization": "Bearer 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"}
+
+
+def query(payload):
+    response = requests.post(API_URL, headers=headers, json=payload)
+    return response.json()
+
+
+sentence_neg = "Ik vond de voorstelling verschrikkelijk, het was slecht geacteerd en het verhaal was niet interessant."
+
+output = query({
+    "inputs": sentence_neg,
+})
+print(f'{sentence_neg}, sentiment:{output[0][0]["label"]} met score:{output[0][0]["score"]:.3f}')
+
+```
+
+```{python}
+def get_sentiment(text):
+    payload = {"inputs": text,}
+    response = requests.post(API_URL, headers=headers, json=payload)
+    output = response.json()
+    print(f'{sentence_neg}, sentiment:{output[0][0]["label"]} met score:{output[0][0]["score"]:.3f}')
+
+txtval = widgets.Text(
+    value='',
+    placeholder='I hated the movie',
+    description='String:',
+    disabled=False
+)
+
+txtval
+```
+
+```{python}
+mybtn = widgets.Button(
+    description='Get sentiment',
+    disabled=False,
+    button_style='', # 'success', 'info', 'warning', 'danger' or ''
+    tooltip='Click',
+    icon='check' # (FontAwesome names without the `fa-` prefix)
+)
+
+@mybtn.on_click
+
+def sayhello_onclick(a):
+    get_sentiment(txtval.value)
+mybtn
+
+```
+
